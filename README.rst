@@ -5,12 +5,13 @@ ti -- A silly simple time tracker
 ``ti`` is a small command line time-tracking application.
 Simple basic usage looks like this::
 
-    $ ti on my-project
-    $ ti fin
+    $ ti -o my-project #start my-project
+    $ ti -f  # finish
 
 You can also give it human-readable times::
 
-    $ ti on my-project 30mins ago
+    $ ti -o my-project --at 16:30 # start project at 16:30
+    $ ti -f --at 17:00
 
 ``ti`` sports many other cool features. Read along to discover.
 
@@ -54,25 +55,25 @@ Usage
 
 Here's the minimal usage style::
 
-    $ ti on my-project
+    $ ti --on my-project
     Start working on my-project.
 
-    $ ti status
+    $ ti --status
     You have been working on my-project for less than a minute.
 
-    $ ti fin
+    $ ti --fin
     So you stopped working on my-project.
 
 ``on`` and ``fin`` can take a time (format described further down) at which to
 apply the action::
 
-    $ ti on another-project 2 hours ago
+    $ ti -o another-project
     Start working on another-project.
 
-    $ ti s
+    $ ti -s #status
     You have been working on another-project for about 2 hours.
 
-    $ ti fin 30 minutes ago
+    $ ti -fin 30 minutes ago
     So you stopped working on another-project.
 
 Also illustrating in the previous example is short aliases of all commands,
@@ -81,16 +82,18 @@ their first letter. Like, ``s`` for ``status``, ``o`` for ``on``,
 
 Put brief notes on what you've been doing::
 
-    $ ti note waiting for Napoleon to take over the world
-    $ ti n another simple note for demo purposes
+    $ ti --note waiting for Napoleon to take over the world
+    $ ti -n another simple note for demo purposes
 
 Tag your activities for fun and profit::
 
-    $ ti tag imp
+    $ ti --tag imp
+    $ ti -t imp
 
 Get a log of all activities with the ``log`` (or ``l``) command::
 
-    $ ti log
+    $ ti --log
+    $ ti -l
 
 Command reference
 =================
@@ -101,30 +104,30 @@ to get a short command summary of commands.
 ``on``
 ------
 
-- Short: ``o``
-- Syntax: ``ti (o|on) <name> [<time>...]``
+- Short: ``-o``
+- Syntax: ``ti (-o|--on) <name> [<time>...]``
 
 Start tracking time for the project/activity given by `<name>`. For example::
 
-    ti on conquest
+    ti --on conquest
 
 tells ``ti`` to start tracking for the activity ``conquest`` *now*.
 You can optionally specify a relative time in the past like so::
 
-    ti on conquest 10mins ago
+    ti --on conquest --at 16:10
 
 The format of the time is detailed further below.
 
 ``fin``
 -------
 
-- Short: ``f``
-- Syntax: ``ti (f|fin) [<time>...]``
+- Short: ``-f``
+- Syntax: ``ti (-f|--fin) [<time>...]``
 
 End tracking for the current activity *now*. Just like with ``on`` command
 above, you can give an optional time to the past. Example::
 
-    ti fin 10mins ago
+    ti --fin --at 16:20
 
 tells ``ti`` that you finished working on the current activity at, well, 10
 minutes ago.
@@ -133,21 +136,21 @@ minutes ago.
 ----------
 
 - Short: ``s``
-- Syntax: ``ti (s|status)``
+- Syntax: ``ti (-s|--status)``
 
 Gives short human-readable message on the current status, i.e., whether anything
 is being tracked currently or not. Example::
 
-    $ ti on conqering-the-world
+    $ ti --on conqering-the-world
     Start working on conqering-the-world.
-    $ ti status
+    $ ti --status
     You have been working on `conqering-the-world` for less than a minute.
 
 ``tag``
 -------
 
-- Short: ``t``
-- Syntax: ``ti (t|tag) <tag>...``
+- Short: ``-t``
+- Syntax: ``ti (-t|--tag) <tag>...``
 
 This command adds the given tags to the current activity. Tags are not currently
 used within the ``ti`` time tracker, but they will be saved in the JSON data
@@ -159,7 +162,7 @@ that activity will appear in red in the final HTML report.
 
 Use it like::
 
-    ti tag red for-joe
+    ti --tag red for-joe
 
 adds the tags ``red`` and ``for-joe`` to the current activitiy. You can specify
 any number of tags.
@@ -170,7 +173,7 @@ Tags are currently for your purpose. Use them as you see fit.
 --------
 
 - Short: ``n``
-- Syntax: ``ti (n|note) <note-text>...``
+- Syntax: ``ti (-n|--note) <note-text>...``
 
 This command adds a note on the current activity. Again, like tags, this has no
 significance with the time tracking aspect of ``ti``. This is for your own
@@ -186,7 +189,7 @@ adds the note ``Discuss this with the other team.`` to the current activity.
 -------
 
 - Short: ``l1``
-- Syntax: ``ti (l|log) [today]``
+- Syntax: ``ti (-l|--log) [today]``
 
 Gives a table like representation of all activities and total time spent on each
 of them.
@@ -248,6 +251,17 @@ After that, ``ti`` should be working fine.
 Also, visit the `project page on GitHub <https://github.com/tbekolay/ti>`_ for
 any further details.
 
+
+Local Install 
+=============
+
+
+```shell
+git clone https://github.com/duncanhealy/ti
+cd ti
+pip install ./
+```
+
 Who?
 ====
 
@@ -255,7 +269,8 @@ Originally created and fed by Shrikant Sharat
 (`@sharat87 <https://twitter.com/#!sharat87>`_).
 Now forked and maintained by Trevor Bekolay
 (`@tbekolay <https://github.com/tbekolay>`_) and friends on GitHub.
-
+Fork by Duncan Healy 
+(`@duncanhealy <https://github.com/duncanhealy>`_) 
 License
 =======
 
