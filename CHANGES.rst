@@ -18,6 +18,10 @@ Release History
    - Removed
    - Fixed
 
+0.2.1 (June 12, 2019)
+
+Add percent for each item, Add instructions to add local project via pip, Correct Documentation
+
 0.1.3 (unreleased)
 ==================
 
