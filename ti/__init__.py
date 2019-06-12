@@ -207,6 +207,16 @@ def action_log(startdate, enddate):
             current = item["name"]
         else:
             end_time = parse_isotime(item['end'])
+        if (end_time.date() >= startdate.date() and start_time.date() <= enddate.date()):
+            delta = end_time - start_time
+            tagList['total']['delta'] += delta
+    for item in work:
+        start_time = parse_isotime(item['start'])
+        if "end" not in item:
+            end_time = NOW
+            current = item["name"]
+        else:
+            end_time = parse_isotime(item['end'])
         if "tags" not in item:
             item["tags"] = ["_noTag_"]
         if (end_time.date() >= startdate.date()
@@ -219,6 +229,8 @@ def action_log(startdate, enddate):
                 else:
                     tagList[tag]['items'][item['name']] = delta
     name_col_len = 0
+    print(tagList['total']['delta'])
+    print('\n')
     for tag, items in sorted(tagList.items(), key=(lambda x: x[0])):
         print(tag.ljust(max(name_col_len, len(tag))),
               "--",
@@ -228,7 +240,7 @@ def action_log(startdate, enddate):
                                   reverse=True):
             print("\t", name.ljust(max(name_col_len, len(name))),
                   ' ∙∙ ',
-                  time_to_string(delta),
+                  time_to_string(delta), round((delta/tagList['total']['delta']),2)*100, '%',
                   end=' ← working\n' if current == name else '\n')
 
 
@@ -342,7 +354,7 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-o", "--on", action="store",
                        help="start an action to work on")
-    group.add_argument("-f", "--fin", action="store_true",
+    group.add_argument("-f", "--fin",  action="store_true",
                        help="end an action")
     group.add_argument("-s", "--status", action="store_true",
                        help="show status", default=False)
