@@ -230,6 +230,7 @@ def action_log(startdate, enddate):
                     tagList[tag]['items'][item['name']] = delta
     name_col_len = 0
     print(tagList['total']['delta'])
+    print(round(tagList['total']['delta']/timedelta(hours=7.5)*100,2),'%')
     print('\n')
     for tag, items in sorted(tagList.items(), key=(lambda x: x[0])):
         print(tag.ljust(max(name_col_len, len(tag))),
@@ -240,7 +241,7 @@ def action_log(startdate, enddate):
                                   reverse=True):
             print("\t", name.ljust(max(name_col_len, len(name))),
                   ' ∙∙ ',
-                  time_to_string(delta), round((delta/tagList['total']['delta']),2)*100, '%',
+                  time_to_string(delta),  round((delta/timedelta(hours=7.5)),2)*100, '%',
                   end=' ← working\n' if current == name else '\n')
 
 
