@@ -243,6 +243,74 @@ def action_log(startdate, enddate):
                   ' ∙∙ ',
                   time_to_string(delta),  round((delta/timedelta(hours=7.5)),2)*100, '%',
                   end=' ← working\n' if current == name else '\n')
+def cmp_to_key(mycmp):
+    'Convert a cmp= function into a key= function'
+    class K:
+        def __init__(self, obj, *args):
+            self.obj = obj
+        def __lt__(self, other):
+            return mycmp(self.obj, other.obj) < 0
+        def __gt__(self, other):
+            return mycmp(self.obj, other.obj) > 0
+        def __eq__(self, other):
+            return mycmp(self.obj, other.obj) == 0
+        def __le__(self, other):
+            return mycmp(self.obj, other.obj) <= 0
+        def __ge__(self, other):
+            return mycmp(self.obj, other.obj) >= 0
+        def __ne__(self, other):
+            return mycmp(self.obj, other.obj) != 0
+    return K
+    
+def action_doc(startdate, enddate):
+    data = STORE.load()
+    work = data['work'] + data['interrupt_stack']
+    current = None
+    tagList = defaultdict(lambda: {'delta': timedelta(), 'items': {}})
+    for item in work:
+        start_time = parse_isotime(item['start'])
+        if "end" not in item:
+            end_time = NOW
+            current = item["name"]
+        else:
+            end_time = parse_isotime(item['end'])
+        if (end_time.date() >= startdate.date() and start_time.date() <= enddate.date()):
+            delta = end_time - start_time
+            tagList['total']['delta'] += delta
+    for item in work:
+        start_time = parse_isotime(item['start'])
+        if "end" not in item:
+            end_time = NOW
+            current = item["name"]
+        else:
+            end_time = parse_isotime(item['end'])
+        if "tags" not in item:
+            item["tags"] = ["_noTag_"]
+        if (end_time.date() >= startdate.date()
+                and start_time.date() <= enddate.date()):
+            delta = end_time - start_time
+            for tag in item["tags"]:
+                tagList[tag]['delta'] += delta
+                if item['name'] in tagList[tag]['items'].keys():
+                    tagList[tag]['items'][item['name']] += delta
+                else:
+                    tagList[tag]['items'][item['name']] = delta
+    name_col_len = 0
+    print(tagList['total']['delta'])
+    print(round(tagList['total']['delta']/timedelta(hours=7.5)*100,2),'%')
+    print('\n')
+    for tag, items in sorted(tagList.items(), key=(lambda x: x[0]), reverse=True):
+        print(tag.ljust(max(name_col_len, len(tag))),
+              "--", round((tagList[tag]['delta']/timedelta(hours=7.5)),2)*100, '%',)
+        for name, delta in sorted(items["items"].items(),
+                                  key=(lambda x: x[0]),
+                                  reverse=True):
+            print("\t", name.ljust(max(name_col_len, len(name))),
+                  ' ∙∙ ',  round((delta/timedelta(hours=7.5)),2)*100, '%',
+                  end=' ← working\n' if current == name else '\n')
+    print('achievements\n')
+    print('blockers\n')
+    print('tomorrows plan\n')
 
 
 def time_to_string(time):
@@ -366,6 +434,8 @@ def main():
 
     group.add_argument("-l", "--log", action="store_true",
                        help="show log", default=False)
+    group.add_argument("-d", "--doc", action="store_true",
+                       help="show log", default=False)
     parser.add_argument("--at", action="store", help="start or stop actions at"
                         + "special time",
                         default=datetime.now().strftime("%H:%M"),
@@ -393,6 +463,8 @@ def main():
                              + ":" + str(arguments.at.minute))
         if arguments.log:
             action_log(arguments.start, arguments.end)
+        if arguments.doc:
+            action_doc(arguments.start, arguments.end)
         if arguments.fin:
             action_fin(str(arguments.at.hour) + ":" + str(arguments.at.minute))
         if arguments.tag:
